@@ -1,0 +1,3 @@
+This folder contains discussions about the project with ChatGPT. I tried to keep the chronology, but it was not always possible. So in some places, there may be small gaps. But overall, if you read in order, everything should be clear.
+
+I use my own [script](https://gist.github.com/GreenWizard2015/7f8ed0b609983b40a97fe7d245345552) to convert chat to Markdown. Also, I often intentionally make errors and try to make the message as short as possible when communicating with AI to increase productivity.
