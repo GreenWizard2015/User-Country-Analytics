@@ -20,7 +20,8 @@ Conversation: [02 - Create the database and tables.md]
 
 ChatGPT analysis of conversation:
 
-```
+---
+
 The dialogue between the human and AI in this conversation was primarily focused on writing tests for a country model in Laravel 8. The AI provided clear and concise instructions on how to write the tests, including the necessary imports, class structure, and methods to use. The AI also demonstrated a good understanding of the testing process, as well as the framework and its testing tools.
 
 One of the strengths of the AI in this dialogue is its ability to provide detailed and accurate information in response to the human's questions. It also demonstrated the ability to adapt to changes in the human's requests, such as when the human asked for the code to be updated in a new format.
@@ -32,7 +33,8 @@ The interaction between the human and AI in this dialogue was primarily focused 
 To optimize this process, it would be beneficial to provide more context or background information in the human's initial question to help the AI better understand the human's needs. Additionally, the AI could be programmed to provide a summary of its response, which would make it easier for the human to quickly find the information they need. The AI can also be programmed to use simpler language, which would make it more accessible to a wider range of users.
 
 The human in this dialogue wrote in a concise and terse manner, using shorthand and abbreviations. This may have slightly hindered the effectiveness of the interaction with the AI as the AI's understanding of the language may have been challenged by the shorthand and abbreviations used. It is possible that the human's communication style may have led to some confusion or misinterpretation on the part of the AI. To optimize this process, it would be beneficial for the human to use clear and complete language, and avoid using shorthand or abbreviations, so that the AI can understand the human's requests and respond appropriately.
-```
+
+---
 
 The AI responded following the Laravel 7 API, but version 8 was needed. The difference in the API led to confusion and loss of time. Additionally, I decided to write the simplest (and unnecessary) tests, which led to problems in the dialogue with the AI. I concluded that it is not worth solving several tasks in one dialogue. It is better to leave the details of the implementation to Copilot AI, as the interaction on the lowest level of implementation is much more efficient. It is also very effective to shorten the message text as AI easily understands it.
 
