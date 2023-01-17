@@ -38,3 +38,14 @@ The human in this dialogue wrote in a concise and terse manner, using shorthand 
 
 The AI responded following the Laravel 7 API, but version 8 was needed. The difference in the API led to confusion and loss of time. Additionally, I decided to write the simplest (and unnecessary) tests, which led to problems in the dialogue with the AI. I concluded that it is not worth solving several tasks in one dialogue. It is better to leave the details of the implementation to Copilot AI, as the interaction on the lowest level of implementation is much more efficient. It is also very effective to shorten the message text as AI easily understands it.
 
+## 03, 04 and 05
+
+Conversation: [03-05.md](03-05.md)
+
+Task 3 turned out to be very ambiguous. At first, everything went well: I asked the AI to play the role of a programming tutor and we quickly made a work plan that was 90% implemented by Copilot AI, but then there were problems. The main reason for the problems was the inability of the AI to cover a large scope and, surprisingly, the inability of a human/myself to work in a narrow scope. For example, the AI was unable to fully understand the behavior of the frontend and backend, so it proposed a typical template, which has unnecessary things for this specific case. There were also problems with different versions of the Laravel API, but I consider this to be normal.
+
+Also, the original task description did not include any conditions for completion or specific tests that should be passed at the end. I misunderstood the task and decided that task 3 (`Create the necessary routes and controllers for handling CRUD operations for the user and country data`) included the implementation of filtering (task 4) and writing tests (task 5), which made the task much more complex.
+
+I would say that ChatGPT demonstrates a level of knowledge equivalent to students on the first/second year of education of college, but it covers a wide range of specializations. The level of knowledge is sufficient to be useful for many people, but it ultimately depends on the experience and expertise of the person that uses it.
+
+

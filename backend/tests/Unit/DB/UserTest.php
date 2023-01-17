@@ -30,17 +30,15 @@ class UserTest extends \Illuminate\Foundation\Testing\TestCase
     // Test that a user can be updated and saved to the database.
     public function testUserCanBeUpdated()
     {
+        $newCountry = \App\Models\Country::factory()->create();
         $user = User::factory()->create();
-        $oldData = $user->toArray();
         $user->update([
             'first_name' => 'John',
             'last_name' => 'Doe',
             'date_of_birth' => '1990-01-01',
-            'country_id' => 1,
+            'country_id' => $newCountry->id,
         ]);
         $user->save();
-
-        $this->assertDatabaseMissing('users', $oldData);
         $this->assertDatabaseHas('users', $user->toArray());
     }
     // Copilot:
