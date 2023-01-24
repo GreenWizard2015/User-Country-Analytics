@@ -49,7 +49,6 @@
     "msw": "^0.49.3"
   },
   "jest": {
-    "setupFiles": ["jest-canvas-mock"],
     "moduleNameMapper": {
       "axios": "axios/dist/node/axios.cjs"
     }
