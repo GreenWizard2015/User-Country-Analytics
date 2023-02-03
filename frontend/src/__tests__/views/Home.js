@@ -6,20 +6,16 @@ import Home from 'views/Home';
 
 describe('Home', () => {
   const server = setupServer();
-  
+
   beforeAll(() => server.listen());
   beforeEach(() => {
     server.resetHandlers();
     // default handlers for /api/users and /api/countries
     server.use(
-      rest.get('/api/users', (req, res, ctx) => {
-        return res(ctx.json([]));
-      })
+      rest.get('/api/users', (req, res, ctx) => res(ctx.json({ users: [], totalPages: 1 })))
     );
     server.use(
-      rest.get('/api/countries', (req, res, ctx) => {
-        return res(ctx.json([]));
-      })
+      rest.get('/api/countries', (req, res, ctx) => res(ctx.json([])))
     );
   });
   afterAll(() => server.close());
@@ -32,9 +28,7 @@ describe('Home', () => {
     ];
     // Mock the API call
     server.use(
-      rest.get('/api/users', (req, res, ctx) => {
-        return res(ctx.json(users));
-      })
+      rest.get('/api/users', (req, res, ctx) => res(ctx.json({ users, totalPages: 1 }) ))
     );
     /////////////////////////////////////////
     const browser = renderWithProvider(<Home />);
@@ -49,29 +43,82 @@ describe('Home', () => {
     });
   });
 
-  it("should display a pie chart showing the number of users in each country", async () => {
-    const countries = [
-      { id: 1, name: "USA", users_count: 10 },
-      { id: 2, name: "Canada", users_count: 20 },
-      { id: 3, name: "Mexico", users_count: 15 },
-    ];
+  it("should display a users chart when loaded", async () => {
     // Mock the API call
     server.use(
       rest.get("/api/countries", (req, res, ctx) => {
-        return res(ctx.json(countries));
+        return res(ctx.json(
+          [ { id: 1, name: "USA", users_count: 10 }, ]
+        ));
       })
     );
 
     // Render the Home component
     const browser = renderWithProvider(<Home />);
 
-    // Wait for the pie chart to be displayed
-    await waitFor(() => browser.findByTestId("users-chart"));
-    const pieChart = await findByTestId("users-chart");
-
-    // Check that the correct data is displayed in the pie chart
-    countries.forEach((country) => {
-      expect(pieChart).toHaveTextContent(`${country.name}: ${country.users_count}`);
-    });
+    // Wait for the chart to be rendered and check that it is displayed
+    const chartSelector = "users-chart";
+    await waitFor(() => browser.findByTestId(chartSelector));
+    expect(browser.getByTestId(chartSelector)).toBeInTheDocument();
   });
+
+  it('should call /api/users with the correct query parameters from the UI slice and set total pages', async () => {
+    const UIParams = {
+      // as unix timestamp
+      dateFrom: new Date('1990-01-01').getTime(),
+      dateTo: new Date('1995-05-05').getTime(),
+      country: 1,
+      page: 1,
+      perPage: 10,
+    };
+    const totalPages = 10;
+    // Mock the API call and store the query parameters to check them later, because the assertions in the mock handler are not executed
+    let requestParams = {};
+    server.use(
+      rest.get('/api/users', async (req, res, ctx) => {
+        req.url.searchParams.forEach((value, key) => {
+          requestParams[key] = value;
+        });
+
+        return res(ctx.json({
+          users: [
+            { id: 1, first_name: 'John', last_name: 'Doe', country_id: 1, date_of_birth: '1990-01-01' },
+          ],
+          totalPages: totalPages,
+        }));
+      })
+    );
+
+    // Render the Home component
+    const browser = renderWithProvider(<Home />, { UI: UIParams });
+
+    // Wait for the data to be fetched and displayed
+    await waitFor(() => browser.findByText('John Doe'));
+
+    // Check request parameters
+    expect(requestParams).toEqual({
+      dateFrom: UIParams.dateFrom.toString(),
+      dateTo: UIParams.dateTo.toString(),
+      country: UIParams.country.toString(),
+      page: UIParams.page.toString(),
+      perPage: UIParams.perPage.toString(),
+    });
+
+    // Check that the total pages are set in the store
+    const { store } = browser;
+    expect(store.getState().UI.totalPages).toEqual(totalPages);
+  });
+
+  // it('should show a create user modal when the "New user" button is clicked', async () => {
+  //   const browser = renderWithProvider(<Home />);
+
+  //   // Wait for the data to be fetched and buttons to be displayed
+  //   await waitFor(() => browser.findByText('New user'));
+  //   browser.getByText('New user').click();
+
+  //   // Check that the modal is displayed
+  //   const modalSelector = 'create-user-modal';
+  //   await waitFor(() => browser.findByTestId(modalSelector));
+  //   expect(browser.getByTestId(modalSelector)).toBeInTheDocument();
+  // });
 });

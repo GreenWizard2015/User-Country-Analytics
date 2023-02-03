@@ -15,10 +15,6 @@ testUpdateUser(): This test should send a PATCH request to the /users/{id} endpo
 
 testDeleteUser(): This test should send a DELETE request to the /users/{id} endpoint with a valid user id and check if the response is successful and if the user is deleted from the database. This test should be run after setting up some test data in the users table.
 
-testFilterUsers(): This test should send a GET request to the /users/filter?country=&from=&to= endpoint with valid parameters for country and date_of_birth range and check if the response contains the filtered users. This test should be run after setting up some test data in the users and countries table.
-
-testInvalidFilterParameters(): This test should send a GET request to the /users/filter?country=&from=&to= endpoint with invalid or missing parameters and check if the response contains the appropriate error message or status code.
-
 testInvalidUpdateDeleteParameters(): This test should send a PATCH or DELETE request to the /users/{id} endpoint with invalid or missing parameters and check if the response contains the appropriate error message or status code.
 
 testInvalidCreateParameters(): This test should send a POST request to the /users endpoint with invalid or missing parameters and check if the response contains the appropriate error message or status code.
@@ -145,60 +141,6 @@ class UsersTest extends \Illuminate\Foundation\Testing\TestCase
         $this->assertDatabaseMissing('users', [
             'id' => $user->id,
         ]);
-    }
-
-    // Route '/api/users/filter?country=&from=&to=' should return a JSON with the filtered users
-    public function testFilterUsers()
-    {
-        // Create a 2 countries
-        $countries = \App\Models\Country::factory()->count(2)->create();
-        // Create 3 users and assign them to the first country
-        $users = \App\Models\User::factory()->count(3)->create([
-            'country_id' => $countries[0]->id,
-            'date_of_birth' => '1980-01-01',
-        ]);
-        // Create a user with the country and date_of_birth that we want to filter
-        $user = \App\Models\User::factory()->create([
-            'country_id' => $countries[1]->id,
-            'date_of_birth' => '1990-01-01',
-        ]);
-        // Get the response from the route
-        $response = $this->get('/api/users/filter?country=' . $countries[1]->id);
-        // Check that the response is a JSON
-        $response->assertHeader('Content-Type', 'application/json');
-        // Check that the response is contains the correct data for the filtered user
-        $response->assertJsonFragment([
-            'id' => $user->id,
-        ]);
-
-        // Check when filtering by date_of_birth
-        $this->get('/api/users/filter?from=1990-01-01&to=1990-01-01')
-            ->assertJsonFragment([
-                'id' => $user->id,
-            ]);
-    }
-
-    // This test should send a GET request to the /users/filter?country=&from=&to= endpoint with invalid or missing parameters and check if the response contains the appropriate error message or status code.
-    public function testFilterUsersWithInvalidParameters()
-    {
-        // Create a country
-        $country = \App\Models\Country::factory()->create();
-
-        // Get and check the response when the country parameter is invalid
-        $this->get('/api/users/filter?country=invalid&from=1980-01-01&to=1990-01-01')
-            ->assertJsonFragment([
-                'message' => 'The given data was invalid.',
-            ]);
-        // Get and check the response when the from parameter is after the to parameter
-        $this->get('/api/users/filter?country=' . $country->id . '&to=1980-01-01&from=1990-01-01')
-            ->assertJsonFragment([
-                'message' => 'The given data was invalid.',
-            ]);
-        // Get and check the response when the to parameter is before the from parameter
-        $this->get('/api/users/filter?country=' . $country->id . '&from=1990-01-01&to=1980-01-01')
-            ->assertJsonFragment([
-                'message' => 'The given data was invalid.',
-            ]);
     }
 
     // testInvalidUpdateParameters(): This test should send a PATCH request to the /users/{id} endpoint with invalid or missing parameters and check if the response contains the appropriate error message or status code.

@@ -1,29 +1,42 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { getUsers } from 'services/UsersService';
+import { setTotalPages } from 'store/UISlice';
 
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-  const response = await axios.get('/api/users');
-  return response.data;
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAPI) => {
+  const { UI: { dateFrom, dateTo, country, page, perPage } } = thunkAPI.getState();
+  const response = await getUsers({ dateFrom, dateTo, country, page, perPage });
+  // set the total number of pages by dispatching the setTotalPages action
+  thunkAPI.dispatch(setTotalPages(response.totalPages));
+  return response;
 });
 
-const usersSlice = createSlice({
+const INITIAL_STATE = {
+  data: [],
+  loaded: false,
+  error: null
+};
+
+export const usersSlice = createSlice({
   name: 'users',
-  initialState: [],
+  initialState: INITIAL_STATE,
   reducers: {
     fetchUsers
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUsers.pending, (state) => {
-        return [];
+        return INITIAL_STATE;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        return action.payload;
+        state.data = action.payload.users;
+        state.loaded = true; 
       })
       .addCase(fetchUsers.rejected, (state, action) => {
-        // Handle the error state
+        state.loaded = true;
+        state.error = action.error.message;
+        state.data = [];
       });
   }
 });
 
-export const usersReducer = usersSlice.reducer;
+export const actions = { fetchUsers };

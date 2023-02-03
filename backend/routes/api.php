@@ -8,9 +8,6 @@ Route::middleware(['errors_as_json'])->group(function () {
   // POST /users - This endpoint is used to create a new user in the database. The client should send the user information in the request body.
   Route::post('/users', 'UserController@store');
   
-  // GET /users/filter?country=&from=&to= - This endpoint is used to retrieve a list of all users from the database.
-  Route::get('/users/filter', 'UserController@filter');
-  
   // GET /users/{id} - This endpoint is used to retrieve a specific user from the database. The {id} path parameter should be replaced with the id of the user you want to retrieve.
   Route::get('/users/{id}', 'UserController@show');
   

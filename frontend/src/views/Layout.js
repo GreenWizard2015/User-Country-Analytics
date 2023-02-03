@@ -10,12 +10,12 @@ import Footer from 'components/Footer';
 export default function Layout() {
   return (
     <div className="flex flex-col h-screen">
-      {/* <Header /> */}
+      <Header />
       <div className="flex-grow">
         <Outlet />
       </div>
       <Notifications />
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }

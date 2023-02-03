@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 ChatGPT:
 Here is a list of methods that the UserController class should have:
 
-index(): This method should handle the GET /users endpoint, it should be responsible for fetching all the records from the "users" table and returning them to the client.
-
-filter(): This method should handle the GET /users/filter?country=&from=&to= endpoint, it should be responsible for fetching all the records from the "users" table that match the provided country and date_of_birth range and returning them to the client.
+index():  This method should handle the GET /users?dateFrom=&dateTo=&country=&page=&perPage= endpoint, it should be responsible for fetching all the records from the "users" table that match the provided country and date_of_birth range and returning them to the client.
 Copilot: All parameters should be optional, if the client doesn't provide a country or date_of_birth range, the method should return all the users from the database.
 
 show(): This method should handle the GET /users/{id} endpoint, it should be responsible for fetching a specific user from the "users" table and returning it to the client.
@@ -22,38 +20,43 @@ destroy(): This method should handle the DELETE /users/{id} endpoint, it should 
 
 class UserController extends Controller
 {
-    // GET /users - This endpoint is used to retrieve a list of all users from the database.
-    public function index()
-    {
-        // Get all users from the database
-        $users = \App\Models\User::all();
-        // Return the users as a JSON
-        return response()->json($users, 200);
-    }
-
-    // GET /users/filter?country=&from=&to= - This endpoint is used to retrieve a list of all users from the database.
-    public function filter(Request $request)
+    // GET /users?dateFrom=&dateTo=&country=&page=&perPage= - This endpoint is used to retrieve a list of all users from the database.
+    // dateFrom: nullable, unix timestamp, if provided, the users should be filtered by the date_of_birth field to only include users that were born after or on the provided date.
+    // dateTo: nullable, unix timestamp, if provided, the users should be filtered by the date_of_birth field to only include users that were born before or on the provided date.
+    // Laraver can't validate the dateFrom and dateTo parameters, so we have to do it manually by regexp
+    public function index(Request $request)
     {
         // Validate the request
         $request->validate([
             'country' => 'exists:countries,id',
-            'from' => 'date:Y-m-d|before_or_equal:to',
-            'to' => 'date:Y-m-d|after_or_equal:from',
+            'dateFrom' => 'regex:/^\d+$/|nullable',
+            'dateTo' => 'regex:/^\d+$/|nullable',
+            'page' => 'integer|min:1',
+            'perPage' => 'integer|min:1',
         ]);
-        // Get the country and date_of_birth range from the request
-        $country = $request->input('country');
-        $from = $request->input('from');
-        $to = $request->input('to');
+        // assert that the all the parameters names are valid
+        $validParams = ['country', 'dateFrom', 'dateTo', 'page', 'perPage'];
+        $invalidParams = array_diff(array_keys($request->all()), $validParams);
+        if (count($invalidParams) > 0) {
+            return response()->json([
+                'message' => 'Invalid parameters: ' . implode(', ', $invalidParams),
+            ], 400);
+        }
+
         // Filter the users based on the provided country and date_of_birth range
-        $users = \App\Models\User::when($country, function ($query, $country) {
-            return $query->where('country_id', $country);
-        })->when($from, function ($query, $from) {
-            return $query->where('date_of_birth', '>=', $from);
-        })->when($to, function ($query, $to) {
-            return $query->where('date_of_birth', '<=', $to);
-        })->get();
+        $usersQuery = \App\Models\User::query()
+            ->withCountryName()
+            ->dateRange($request->input('dateFrom'), $request->input('dateTo'))
+            ->country($request->input('country'));
+
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+        $paginated = $usersQuery->paginate($perPage, ['*'], 'page', $page);
         // Return the users as a JSON
-        return response()->json($users, 200);
+        return response()->json([
+            'users' => $paginated->items(),
+            'totalPages' => (0 < $paginated->total()) ? $paginated->lastPage() : 0,
+        ], 200);
     }
 
     // GET /users/{id} - This endpoint is used to retrieve a specific user from the database. The {id} path parameter should be replaced with the id of the user you want to retrieve.

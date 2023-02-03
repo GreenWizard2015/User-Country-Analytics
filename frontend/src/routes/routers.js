@@ -1,14 +1,15 @@
 import * as React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+// views
 import Layout from "views/Layout";
 import Home from "views/Home";
 import AddUser from "views/AddUser";
 import EditUser from "views/EditUser";
 import UserDetails from "views/UserDetails";
 import NotFound from "views/NotFound";
+import { useRoutes } from "react-router-dom";
 
-const routes = [
+const routesConfig = [
   {
     path: "/",
     element: <Layout />,
@@ -16,18 +17,21 @@ const routes = [
       {
         path: "/",
         element: <Home />,
-      },
-      {
-        path: "add",
-        element: <AddUser />,
-      },
-      {
-        path: "edit/:id",
-        element: <EditUser />,
-      },
-      {
-        path: "user/:id",
-        element: <UserDetails />,
+        // modals
+        children: [
+          {
+            path: "/add",
+            element: <AddUser />,
+          },
+          {
+            path: "/edit/:id",
+            element: <EditUser />,
+          },
+          {
+            path: "/user/:id",
+            element: <UserDetails />,
+          },
+        ],
       },
     ]
   },
@@ -37,12 +41,7 @@ const routes = [
   }
 ];
 
-const router = createBrowserRouter(routes);
-
-export default function Routers(children) {
-  return (
-    <RouterProvider router={router}>
-      {children}
-    </RouterProvider>
-  );
+export default function Routers() {
+  const routes = useRoutes(routesConfig);
+  return routes;
 }
