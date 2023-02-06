@@ -7,7 +7,7 @@ function HttpErrorNotification() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    axios.interceptors.response.use(
+    const interceptor = axios.interceptors.response.use(
       response => response,
       error => {
         dispatch(addNotification({
@@ -19,7 +19,10 @@ function HttpErrorNotification() {
         return Promise.reject(error);
       }
     );
-  }, [dispatch]);
+
+    // Remove the interceptor when the component unmounts
+    return () => axios.interceptors.response.eject(interceptor);
+  }, []);
 }
 
 export default HttpErrorNotification;

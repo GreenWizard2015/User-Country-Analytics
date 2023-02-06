@@ -5,7 +5,6 @@ import { removeNotification, addNotification } from 'store/notificationsSlice';
 class Notifications extends Component {
   renderNotifications() {
     const { notifications, removeNotification } = this.props;
-    console.log('notifications', notifications);
     return notifications.map((notification, index) => {
       return (
         <div key={notification.id} className="notification" onClick={() => removeNotification(notification.id)}>

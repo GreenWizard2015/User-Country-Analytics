@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import AddUserModal from 'components/modals/AddUserModal';
-import { push as navigateTo } from 'redux-first-history';
+import storeActions from 'store/actions';
 
 export class AddUser extends Component {
   render() {
@@ -11,13 +11,22 @@ export class AddUser extends Component {
     if (!loaded) return null;
     return (
       <>
-        <AddUserModal countries={data} goHome={() => this.props.navigateTo('/')} />
+        <AddUserModal
+          countries={data}
+          rejected={this.props.goHome}
+          save={this.props.createUser}
+        />
       </>
     );
   }
 }
 
+function requiredActions() {
+  const { actions: { goHome, createUser } } = storeActions;
+  return { goHome, createUser };
+}
+
 export default connect(
   state => ({ countries: state.countries }),
-  { navigateTo }
+  requiredActions()
 )(AddUser);

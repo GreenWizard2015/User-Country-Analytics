@@ -4,10 +4,9 @@ import CustomDatePicker from 'components/CustomDatePicker';
 
 class AddUserModal extends Component {
   state = {
-    show: false,
     firstName: '',
     lastName: '',
-    dateOfBirth: '',
+    dateOfBirth: null,
     country: '',
     newCountry: '',
   };
@@ -30,7 +29,7 @@ class AddUserModal extends Component {
     const data = {
       firstName,
       lastName,
-      dateOfBirth,
+      dateOfBirth: dateOfBirth.getTime(),
       country: country === 'new' ? newCountry : country,
     };
     this.props.save(data);
@@ -70,12 +69,12 @@ class AddUserModal extends Component {
   }
 
   dateOfBirthField() {
-    // for testing purposes, we can pass a custom date picker component
-    const DatePickerComponent = this.props.datePickerComponent || CustomDatePicker;
     return (
       <Form.Group as={Col} controlId="formDateOfBirth">
         <Form.Label>Date of Birth</Form.Label>
-        <DatePickerComponent
+        <CustomDatePicker
+          id="formDateOfBirth"
+          dateFormat="DD-MM-YYYY"
           selected={this.state.dateOfBirth}
           onChange={this.handleDateChange}
           className="form-control"
@@ -90,7 +89,7 @@ class AddUserModal extends Component {
     // invalid when firstName, lastName or dateOfBirth is empty
     if (0 == firstName.length) return false;
     if (0 == lastName.length) return false;
-    if (0 == dateOfBirth.length) return false;
+    if (null == dateOfBirth) return false;
 
     // validate country
     const { country, newCountry } = this.state;
@@ -101,7 +100,7 @@ class AddUserModal extends Component {
 
     return true;
   }
-  
+
   render() {
     return (
       <Modal show={true} onHide={this.handleClose}>

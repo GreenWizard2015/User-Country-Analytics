@@ -87,7 +87,23 @@ describe('UsersDataGrid', () => {
     expect(removeUser).toHaveBeenCalledWith(user.id);
   });
 
-  it('should be add "New user" button that calls addUser', () => {
+  it('should call only removeUser when clicking on the remove button', () => {
+    const removeUser = jest.fn();
+    const viewUser = jest.fn();
+    const user = { id: 123, first_name: 'Test', last_name: 'User', country_name: 'USA', age: 25 };
+    const props = {
+      ...DEFAULT_PROPS,
+      removeUser,
+      viewUser,
+      users: { ...DEFAULT_PROPS.users, data: [...DEFAULT_PROPS.users.data, user] },
+    };
+    const { container } = render(<UsersDataGrid {...props} />);
+    const button = container.querySelector('tr:nth-child(3) button');
+    fireEvent.click(button);
+    expect(viewUser).not.toHaveBeenCalled();
+  });
+
+  it('should be "New user" button that calls addUser', () => {
     const addUser = jest.fn();
     const props = { ...DEFAULT_PROPS, addUser };
     const { getByText } = render(<UsersDataGrid {...props} />);

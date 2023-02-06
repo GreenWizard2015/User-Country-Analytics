@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import AddUserModal from 'components/modals/AddUserModal';
+import moment from 'moment';
 
 describe('AddUserModal', () => {
   const countries = [
@@ -8,15 +9,9 @@ describe('AddUserModal', () => {
     { id: 2, name: 'Canada' },
     { id: 3, name: 'Mexico' },
   ];
-  function fakeDatePicker({ onChange, ...props }) {
-    function handleChange(event) {
-      onChange(event.target.value);
-    }
-    return <input type="text" {...props} data-testid="dateOfBirth" onChange={handleChange} />;
-  }
 
   function renderAddUserModal(args = {}) {
-    const browser = render(<AddUserModal countries={countries} datePickerComponent={fakeDatePicker} {...args} />);
+    const browser = render(<AddUserModal countries={countries} {...args} />);
     const METHOD = {
       'text': { true: browser.getByText, false: browser.queryByText },
       'labelText': { true: browser.getByLabelText, false: browser.queryByLabelText },
@@ -30,7 +25,7 @@ describe('AddUserModal', () => {
         lastName: (raise = true) => METHOD['labelText'][raise]('Last Name'),
         country: (raise = true) => METHOD['labelText'][raise]('Country'),
         newCountry: (raise = true) => METHOD['placeholderText'][raise]('Enter new country name'),
-        dateOfBirth: (raise = true) => METHOD['testId'][raise]('dateOfBirth'),
+        dateOfBirth: (raise = true) => METHOD['labelText'][raise]('Date of Birth'),
         saveButton: (raise = true) => METHOD['text'][raise]('Save'),
         cancelButton: (raise = true) => METHOD['text'][raise]('Cancel'),
       }
@@ -76,7 +71,7 @@ describe('AddUserModal', () => {
     fireEvent.change(UI.firstName(), { target: { value: 'John' } });
     fireEvent.change(UI.lastName(), { target: { value: 'Smith' } });
     fireEvent.change(UI.country(), { target: { value: 'Canada' } });
-    fireEvent.change(UI.dateOfBirth(), { target: { value: '2019-10-10' } });
+    fireEvent.change(UI.dateOfBirth(), { target: { value: '10-11-2019' } });
 
     expect(UI.saveButton()).toBeEnabled();
     fireEvent.click(UI.saveButton());
@@ -85,7 +80,8 @@ describe('AddUserModal', () => {
       firstName: 'John',
       lastName: 'Smith',
       country: 'Canada',
-      dateOfBirth: '2019-10-10',
+      // as unix timestamp
+      dateOfBirth: moment('10-11-2019', 'DD-MM-YYYY').toDate().getTime(),
     });
   });
 
@@ -94,7 +90,7 @@ describe('AddUserModal', () => {
     const { UI } = renderAddUserModal({ save: saveHandler });
     fireEvent.change(UI.firstName(), { target: { value: 'John' } });
     fireEvent.change(UI.lastName(), { target: { value: 'Smith' } });
-    fireEvent.change(UI.dateOfBirth(), { target: { value: '2019-10-10' } });
+    fireEvent.change(UI.dateOfBirth(), { target: { value: '10-11-2019' } });
     fireEvent.change(UI.country(), { target: { value: 'new' } });
     fireEvent.change(UI.newCountry(), { target: { value: 'New Zealand' } });
 
@@ -105,7 +101,8 @@ describe('AddUserModal', () => {
       firstName: 'John',
       lastName: 'Smith',
       country: 'New Zealand',
-      dateOfBirth: '2019-10-10',
+      // as unix timestamp
+      dateOfBirth: moment('10-11-2019', 'DD-MM-YYYY').toDate().getTime(),
     });
   });
 

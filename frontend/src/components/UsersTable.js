@@ -2,6 +2,17 @@ import React from "react";
 import { useTable } from "react-table";
 
 export default function UsersTable({ users, viewUser, removeUser }) {
+  function makeHandler(f) {
+    return (id) => {
+      return (ev) => {
+        ev.stopPropagation();
+        f(id);
+      };
+    };
+  }
+  const onRowClick = React.useMemo(() => makeHandler(viewUser), [viewUser]);
+  const onRemoveUser = React.useMemo(() => makeHandler(removeUser), [removeUser]);
+  
   // memoize the users data and columns
   const data = React.useMemo(() => users, [users]);
   const columns = React.useMemo(() => [
@@ -19,7 +30,7 @@ export default function UsersTable({ users, viewUser, removeUser }) {
     },
     {
       Header: 'Actions',
-      Cell: ({ row: { original: { id } } }) => <button className='btn btn-danger' onClick={() => removeUser(id)}>Remove</button>
+      Cell: ({ row: { original: { id } } }) => <button className='btn btn-danger' onClick={onRemoveUser(id)}>Remove</button>
     }
   ], [removeUser]);
 
@@ -46,7 +57,7 @@ export default function UsersTable({ users, viewUser, removeUser }) {
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()} onClick={() => viewUser(row.original.id)}>
+            <tr {...row.getRowProps()} onClick={onRowClick(row.original.id)}>
               {row.cells.map((cell) => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
               })}

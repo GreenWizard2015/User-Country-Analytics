@@ -3,6 +3,7 @@ import { actions as usersActions } from 'store/usersSlice';
 import { actions as countriesActions } from 'store/countriesSlice';
 import { actions as UIActions } from 'store/UISlice';
 import { actions as notificationsActions } from 'store/notificationsSlice';
+import { actions as appActions } from 'store/AppActions';
 import { push } from 'redux-first-history';
 
 const actions = {
@@ -12,6 +13,7 @@ const actions = {
   notifications: notificationsActions,
   router: {
     navigateTo: push
-  }
+  },
+  actions: appActions,
 };
 export default actions;

@@ -17,3 +17,5 @@ ReactECharts.prototype.getEchartsInstance = function() {
     e.getInstanceByDom(_this.ele) || e.init(_this.ele, _this.props.theme, opts)
   );
 };
+
+jest.mock("components/CustomDatePicker"); // mock CustomDatePicker for testing purposes

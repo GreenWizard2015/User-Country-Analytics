@@ -63,7 +63,6 @@ export class UsersDataGrid extends Component {
 
   addUser = e => {
     e.preventDefault();
-    // this.props.navigateTo('/add');
     this.props.addUser();
   }
 
@@ -103,8 +102,8 @@ export class UsersDataGrid extends Component {
 }
 
 function requiredActions() {
-  const { users: { fetchUsers }, UI: { setPage, setTotalPages, setPerPage }, router: { navigateTo } } = storeActions;
-  return { fetchUsers, setPage, setTotalPages, setPerPage, navigateTo };
+  const { users: { fetchUsers }, UI: { setPage, setTotalPages, setPerPage }, actions: { AddUserDialog, RemoveUserDialog } } = storeActions;
+  return { fetchUsers, setPage, setTotalPages, setPerPage, addUser: AddUserDialog, removeUser: RemoveUserDialog };
 }
 
 export default connect(

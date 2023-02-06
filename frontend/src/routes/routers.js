@@ -7,6 +7,8 @@ import AddUser from "views/AddUser";
 import EditUser from "views/EditUser";
 import UserDetails from "views/UserDetails";
 import NotFound from "views/NotFound";
+import RemoveUser from "views/RemoveUser";
+
 import { useRoutes } from "react-router-dom";
 
 const routesConfig = [
@@ -24,13 +26,17 @@ const routesConfig = [
             element: <AddUser />,
           },
           {
-            path: "/edit/:id",
+            path: "/edit/:userId",
             element: <EditUser />,
           },
           {
-            path: "/user/:id",
+            path: "/user/:userId",
             element: <UserDetails />,
           },
+          {
+            path: "/remove/:userId",
+            element: <RemoveUser />,
+          }
         ],
       },
     ]

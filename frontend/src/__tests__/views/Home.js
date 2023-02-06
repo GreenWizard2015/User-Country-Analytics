@@ -108,17 +108,4 @@ describe('Home', () => {
     const { store } = browser;
     expect(store.getState().UI.totalPages).toEqual(totalPages);
   });
-
-  // it('should show a create user modal when the "New user" button is clicked', async () => {
-  //   const browser = renderWithProvider(<Home />);
-
-  //   // Wait for the data to be fetched and buttons to be displayed
-  //   await waitFor(() => browser.findByText('New user'));
-  //   browser.getByText('New user').click();
-
-  //   // Check that the modal is displayed
-  //   const modalSelector = 'create-user-modal';
-  //   await waitFor(() => browser.findByTestId(modalSelector));
-  //   expect(browser.getByTestId(modalSelector)).toBeInTheDocument();
-  // });
 });
