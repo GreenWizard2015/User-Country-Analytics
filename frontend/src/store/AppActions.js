@@ -2,16 +2,20 @@
 import { push } from 'redux-first-history';
 import UsersService from 'services/UsersService';
 
-// dialog actions:
-// AddUserDialog - triggers the add user modal
-// ViewUserDialog - triggers the view user modal
-// RemoveUserDialog - triggers the remove user modal
 export const AddUserDialog = () => (dispatch) => {
   dispatch(push('/add'));
 };
 
+export const ViewUserDialog = (id) => (dispatch) => {
+  dispatch(push(`/user/${id}`));
+};
+
 export const RemoveUserDialog = (id) => (dispatch) => {
-  dispatch(push(`/remove/${id}`));
+  dispatch(push(`/user/${id}/remove`));
+};
+
+export const EditUserDialog = (id) => (dispatch) => {
+  dispatch(push(`/user/${id}/edit`));
 };
 ///////////////////////////////////////////////////////////////////////////////////////
 export const goHome = () => (dispatch) => {
@@ -29,6 +33,6 @@ export const createUser = (user) => async (dispatch) => {
 };
 
 export const actions = {
-  AddUserDialog, RemoveUserDialog,
+  AddUserDialog, RemoveUserDialog, ViewUserDialog, EditUserDialog,
   goHome, createUser
 };

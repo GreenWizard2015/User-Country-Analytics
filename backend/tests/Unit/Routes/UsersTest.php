@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Routes;
 
+use Carbon\Carbon;
+
 /*
 ChatGPT:
 
@@ -41,7 +43,8 @@ class UsersTest extends \Illuminate\Foundation\Testing\TestCase
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'country_id' => $user->country_id,
-                'date_of_birth' => $user->date_of_birth->format('Y-m-d'),
+                'date_of_birth' => $user->date_of_birth->timestamp,
+                'country_name' => $user->country->name,
             ]);
         }
     }
@@ -49,30 +52,62 @@ class UsersTest extends \Illuminate\Foundation\Testing\TestCase
     // Route '/api/users' should create a new user and return a JSON with the new user
     public function testCreateUser()
     {
-        // Create a country
-        $country = \App\Models\Country::factory()->create();
+        $dateOfBirth = Carbon::createFromFormat('d-m-Y', '21-06-1990')->floorDay();
+        $country = \App\Models\Country::factory()->create(['name' => 'Test Country']);
         // Get the response from the route
         $response = $this->post('/api/users', [
             'first_name' => 'Test',
             'last_name' => 'User',
-            'country_id' => $country->id,
-            'date_of_birth' => '1990-01-01',
+            'country_name' => $country->name,
+            'date_of_birth' => $dateOfBirth->timestamp,
         ]);
+
         // Check that the response is a JSON
         $response->assertHeader('Content-Type', 'application/json');
         // Check that the response is contains the correct data for the new user
-        $response->assertJsonFragment([
+        $response->assertJson([
             'first_name' => 'Test',
             'last_name' => 'User',
-            'country_id' => $country->id,
-            'date_of_birth' => '1990-01-01',
+            'country_name' => $country->name,
+            'date_of_birth' => $dateOfBirth->timestamp,
         ]);
-        // Check that the new user is in the database
+
+        // Check that the new user is in the database`
         $this->assertDatabaseHas('users', [
             'first_name' => 'Test',
             'last_name' => 'User',
             'country_id' => $country->id,
-            'date_of_birth' => '1990-01-01',
+            'date_of_birth' => $dateOfBirth->format('Y-m-d'),
+        ]);
+    }
+
+    // Route '/api/users' should create a new user and country and return a JSON with the new user
+    public function testCreateUserAndCountry()
+    {
+        $dateOfBirth = Carbon::createFromFormat('d-m-Y', '21-06-1990')->floorDay();
+        $countryName = 'Test Country';
+        // Get the response from the route
+        $response = $this->post('/api/users', [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'country_name' => $countryName,
+            'date_of_birth' => $dateOfBirth->timestamp,
+        ]);
+
+        // Check that the response is a JSON
+        $response->assertHeader('Content-Type', 'application/json');
+        // Check that the response is contains the correct data for the new user
+        $response->assertJson([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'country_name' => $countryName,
+            'date_of_birth' => $dateOfBirth->timestamp,
+        ]);
+
+        // Check that the new user is in the database`
+        $this->assertDatabaseHas('countries', [
+            'name' => $countryName,
+            'id' => $response->json('country_id'),
         ]);
     }
 
@@ -91,23 +126,28 @@ class UsersTest extends \Illuminate\Foundation\Testing\TestCase
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'country_id' => $user->country_id,
-            'date_of_birth' => $user->date_of_birth->format('Y-m-d'),
+            'date_of_birth' => $user->date_of_birth->timestamp,
+            'country_name' => $user->country->name,
         ]);
     }
 
     // Route '/api/users/{id}' should update the user and return a JSON with the updated user
     public function testUpdateUser()
     {
+        $dateOfBirth = Carbon::createFromFormat('d-m-Y', '28-06-1990')->floorDay();
         // Create a user
         $user = \App\Models\User::factory()->create();
-        $newCountry = \App\Models\Country::factory()->create();
+        $newCountry = \App\Models\Country::factory()->create([
+            'name' => 'New Country',
+        ]);
         // Get the response from the route
         $response = $this->patch('/api/users/' . $user->id, [
             'first_name' => 'Updated User',
             'last_name' => 'User',
-            'country_id' => $newCountry->id,
-            'date_of_birth' => '1990-01-01',
+            'country_name' => $newCountry->name,
+            'date_of_birth' => $dateOfBirth->timestamp,
         ]);
+
         // Check that the response is a JSON
         $response->assertHeader('Content-Type', 'application/json');
         // Check that the response is contains the correct data for the updated user
@@ -116,7 +156,7 @@ class UsersTest extends \Illuminate\Foundation\Testing\TestCase
             'first_name' => 'Updated User',
             'last_name' => 'User',
             'country_id' => $newCountry->id,
-            'date_of_birth' => '1990-01-01',
+            'date_of_birth' => $dateOfBirth->timestamp,
         ]);
         // Check that the user is updated in the database
         $this->assertDatabaseHas('users', [
@@ -124,7 +164,7 @@ class UsersTest extends \Illuminate\Foundation\Testing\TestCase
             'first_name' => 'Updated User',
             'last_name' => 'User',
             'country_id' => $newCountry->id,
-            'date_of_birth' => '1990-01-01',
+            'date_of_birth' => $dateOfBirth->format('Y-m-d'),
         ]);
     }
 

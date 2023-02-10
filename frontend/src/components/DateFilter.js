@@ -15,7 +15,7 @@ class DateFilter extends Component {
       <div className="row date-filter">
         <div className="col-md-5 col-12">
           <CustomDatePicker
-            dateFormat="DD-MM-YYYY"
+            dateFormat="dd-MM-yyyy"
             selected={dateFrom}
             onChange={acceptTimestamp(this.props.setDateFrom)}
             selectsStart
@@ -28,7 +28,7 @@ class DateFilter extends Component {
 
         <div className="col-md-5 col-12">
           <CustomDatePicker
-            dateFormat="DD-MM-YYYY"
+            dateFormat="dd-MM-yyyy"
             selected={dateTo}
             onChange={acceptTimestamp(this.props.setDateTo)}
             selectsEnd

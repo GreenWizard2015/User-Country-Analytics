@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 /*
 ChatGPT:
@@ -29,8 +32,8 @@ class UserController extends Controller
         // Validate the request
         $request->validate([
             'country' => 'exists:countries,id',
-            'dateFrom' => 'regex:/^\d+$/|nullable',
-            'dateTo' => 'regex:/^\d+$/|nullable',
+            'dateFrom' => 'integer|nullable',
+            'dateTo' => 'integer|nullable',
             'page' => 'integer|min:1',
             'perPage' => 'integer|min:1',
         ]);
@@ -45,33 +48,24 @@ class UserController extends Controller
 
         // Filter the users based on the provided country and date_of_birth range
         $usersQuery = \App\Models\User::query()
-            ->withCountryName()
+            // ->with('country')
             ->dateRange($request->input('dateFrom'), $request->input('dateTo'))
             ->country($request->input('country'));
 
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
         $paginated = $usersQuery->paginate($perPage, ['*'], 'page', $page);
-        // Return the users as a JSON
-        return response()->json([
-            'users' => $paginated->items(),
-            'totalPages' => (0 < $paginated->total()) ? $paginated->lastPage() : 0,
-        ], 200);
+
+        return UserCollection::make($paginated);
     }
 
     // GET /users/{id} - This endpoint is used to retrieve a specific user from the database. The {id} path parameter should be replaced with the id of the user you want to retrieve.
     public function show($id)
     {
-        // Get the user from the database
-        $user = \App\Models\User::find($id);
-        // If the user doesn't exist, return a 404 response
-        if (!$user) {
-            return response()->json([
-                'message' => 'User not found',
-            ], 404);
-        }
-        // Return the user as a JSON
-        return response()->json($user, 200);
+        // Get the user from the database OR fail
+        return new UserResource(
+            \App\Models\User::findOrFail($id)
+        );
     }
 
     // PATCH /users/{id} - This endpoint is used to update a specific user in the database via a country. The {id} path parameter should be replaced with the id of the user you want to update and the client should send the updated information in the request body.
@@ -81,38 +75,30 @@ class UserController extends Controller
         $request->validate([
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'date_of_birth' => 'required|date',
-            'country_id' => 'required|exists:countries,id',
+            'date_of_birth' => 'required|integer',
+            'country_name' => 'required|string',
         ]);
-        // Get the user from the database
-        $user = \App\Models\User::find($id);
-        // If the user doesn't exist, return a 404 response
-        if (!$user) {
-            return response()->json([
-                'message' => 'User not found',
-            ], 404);
-        }
+        $user = \App\Models\User::findOrFail($id);
+        // Get the country from the database
+        $country = \App\Models\Country::where('name', $request->input('country_name'))->first();
+        // // Get or create the country
+        // $country = \App\Models\Country::firstOrCreate([
+        //     'name' => $request->input('country_name'),
+        // ]);
         // Update the user
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
         $user->date_of_birth = $request->input('date_of_birth');
-        $user->country_id = $request->input('country_id');
+        $user->country_id = $country->id;
         $user->save();
-        // Return the user as a JSON
-        return response()->json($user, 200);
+
+        return new UserResource($user);
     }
 
     // DELETE /users/{id} - This endpoint is used to delete a specific user from the database. The {id} path parameter should be replaced with the id of the user you want to delete.
     public function destroy($id)
     {
-        // Get the user from the database
-        $user = \App\Models\User::find($id);
-        // If the user doesn't exist, return a 404 response
-        if (!$user) {
-            return response()->json([
-                'message' => 'User not found',
-            ], 404);
-        }
+        $user = \App\Models\User::findOrFail($id);
         // Delete the user
         $user->delete();
         // Return a 204 response
@@ -126,18 +112,23 @@ class UserController extends Controller
         $request->validate([
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'date_of_birth' => 'required|date',
-            'country_id' => 'required|exists:countries,id',
+            'date_of_birth' => 'required|integer',
+            'country_name' => 'required|string',
         ]);
-        // Create the user
+
+        $dateOfBirth = Carbon::createFromTimestamp($request->input('date_of_birth'));
+        // Create the user and country if they don't exist
+        $country = \App\Models\Country::firstOrCreate([
+            'name' => $request->input('country_name'),
+        ]);
         $user = \App\Models\User::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
-            'date_of_birth' => $request->input('date_of_birth'),
-            'country_id' => $request->input('country_id'),
+            'date_of_birth' => $dateOfBirth,
+            'country_id' => $country->id,
         ]);
         $user->save();
-        // Return the user as a JSON
-        return response()->json($user, 201);
+
+        return new UserResource($user);
     }
 }

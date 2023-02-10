@@ -2,9 +2,9 @@ import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { fireEvent, waitFor } from '@testing-library/react';
 import renderWithProvider from 'utils/renderWithProvider';
-import App from 'app';
 import { addNotification } from 'store/notificationsSlice';
 import { act } from 'react-dom/test-utils';
+import App from 'app';
 
 describe('App', () => {
   const server = setupServer();
@@ -17,7 +17,9 @@ describe('App', () => {
       rest.get('/api/users', (req, res, ctx) => res(ctx.json({ users: [], totalPages: 1 })))
     );
     server.use(
-      rest.get('/api/countries', (req, res, ctx) => res(ctx.json([])))
+      rest.get('/api/countries', (req, res, ctx) => res(ctx.json([
+        { id: 1, name: 'USA' },
+      ])))
     );
   });
   afterAll(() => server.close());
@@ -53,14 +55,14 @@ describe('App', () => {
     await browser.findByText('New user');
     fireEvent.click(browser.getByText('New user'));
     // wait for the /add page to load and click the 'Cancel' button
-    await browser.findByText('Save');
-    expect(browser.getByText('Save')).toBeInTheDocument();
+    await browser.findByText('Create');
+    expect(browser.getByText('Create')).toBeInTheDocument();
     expect(browser.store.getState().router.location.pathname).toBe('/add');
     // Cancel the creation of a new user
     fireEvent.click(browser.getByText('Cancel'));
     // 'Save' button is not present on the / page
     expect(browser.store.getState().router.location.pathname).toBe('/');
-    expect(browser.queryByText('Save')).toBeNull();
+    expect(browser.queryByText('Create')).toBeNull();
   });
 
   it('should create a new user', async () => {
@@ -84,16 +86,19 @@ describe('App', () => {
     await browser.findByText('New user');
     fireEvent.click(browser.getByText('New user'));
     // wait for the /add page to load and fill in the form
-    await browser.findByText('Save');
+    await browser.findByText('Create User');
     fireEvent.change(browser.getByLabelText('First Name'), { target: { value: 'John' } });
     fireEvent.change(browser.getByLabelText('Last Name'), { target: { value: 'Doe' } });
     fireEvent.change(browser.getByLabelText('Date of Birth'), { target: { value: '01-02-2000' } });
-    fireEvent.change(browser.getByLabelText('Country'), { target: { value: 'new' } });
+
+    const countrySelect = browser.getByLabelText('Country');
+    // select last option in the select
+    fireEvent.change(countrySelect, { target: { value: countrySelect.options[countrySelect.options.length - 1].value } });
     fireEvent.change(browser.getByPlaceholderText('Enter new country name'), { target: { value: 'USA' } });
-    // 'Save' button is enabled
-    expect(browser.getByText('Save')).not.toBeDisabled();
+
+    expect(browser.getByText('Create')).not.toBeDisabled();
     await act(async () => {
-      fireEvent.click(browser.getByText('Save'));
+      fireEvent.click(browser.getByText('Create'));
     });
     expect(userCreated).toBe(true);
 
@@ -140,11 +145,16 @@ describe('App', () => {
     await browser.findByText('No users found');
   });
 
-  false && it('should edit a user', async () => {
+  it('should edit a user', async () => {
     // mock the api
     let userEdited = false;
     server.use(
-      rest.put('/api/users/1', (req, res, ctx) => {
+      rest.get('/api/users/1', (req, res, ctx) => {
+        return res(ctx.json({
+          id: 1, last_name: 'Doe', date_of_birth: '2000-01-02', country_name: 'USA', country_id: 1, first_name: 'John',
+        }));
+      }),
+      rest.patch('/api/users/1', (req, res, ctx) => {
         userEdited = true;
         return res(ctx.json({}));
       }),
@@ -162,20 +172,25 @@ describe('App', () => {
     const browser = renderWithProvider(<App />);
     // wait for the / page to load
     await browser.findByText('John Doe');
-    // double click the user
-    fireEvent.doubleClick(browser.getByText('John Doe'));
+    // click the user
+    fireEvent.click(browser.getByText('John Doe'));
     // wait for the /edit page to load and fill in the form
-    await browser.findByText('Save');
+    await waitFor(() => {
+      expect(browser.getByText('Edit User')).toBeInTheDocument();
+      expect(browser.getByText('Save')).toBeInTheDocument();
+    });
+    expect(browser.getByLabelText('First Name')).toHaveValue('John');
+
     fireEvent.change(browser.getByLabelText('First Name'), { target: { value: 'Jane' } });
     // 'Save' button is enabled
-    expect(browser.getByText('Save')).not.toBeDisabled();
+    expect(browser.getByText('Save')).toBeEnabled();
     await act(async () => {
       fireEvent.click(browser.getByText('Save'));
     });
     expect(userEdited).toBe(true);
 
     // wait for the / page to load and check that the user is edited
-    await browser.findByText('Jane Doe');
+    await waitFor(() => expect(browser.queryByText('Save')).toBe(null));
     expect(browser.store.getState().router.location.pathname).toBe('/');
     expect(browser.getByText('Jane Doe')).toBeInTheDocument();
   });

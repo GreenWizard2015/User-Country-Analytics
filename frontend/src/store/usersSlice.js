@@ -10,13 +10,25 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAP
   return response;
 });
 
-// removeUser
-export const removeUser = createAsyncThunk('users/removeUser', async (id, thunkAPI) => {
+// removeUser simple thunk
+export const removeUser = (id) => async (dispatch) => {
   await UsersService.removeUser(id);
 
   // fetch users again
-  await thunkAPI.dispatch(fetchUsers());
-});
+  await dispatch(fetchUsers());
+};
+
+// updateUser(userId, data) simple thunk
+export const updateUser = (userId, data) => async (dispatch) => {
+  await UsersService.updateUser(userId, data);
+  await dispatch(fetchUsers());
+};
+
+// fetchUser(userId) simple thunk
+export const fetchUser = (userId) => async (dispatch) => {
+  const response = await UsersService.getUser(userId);
+  return response;
+};
 
 const INITIAL_STATE = {
   data: [],
@@ -37,22 +49,9 @@ export const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.data = action.payload.users;
-        state.loaded = true; 
+        state.loaded = true;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
-        state.loaded = true;
-        state.error = action.error.message;
-        state.data = [];
-      });
-    // for removeUser
-    builder
-      .addCase(removeUser.pending, (state) => {
-        return INITIAL_STATE;
-      })
-      .addCase(removeUser.fulfilled, (state, action) => {
-        // ignore the response because we already fetched users again
-      })
-      .addCase(removeUser.rejected, (state, action) => {
         state.loaded = true;
         state.error = action.error.message;
         state.data = [];
@@ -60,4 +59,4 @@ export const usersSlice = createSlice({
   }
 });
 
-export const actions = { fetchUsers, removeUser };
+export const actions = { fetchUsers, removeUser, updateUser, fetchUser };

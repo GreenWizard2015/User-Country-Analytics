@@ -25,16 +25,17 @@ const routesConfig = [
             path: "/add",
             element: <AddUser />,
           },
+          // /user/:userId area
           {
-            path: "/edit/:userId",
+            path: "/user/:userId",
+            element: <EditUser />, // same as edit for simplicity
+          },
+          {
+            path: "/user/:userId/edit",
             element: <EditUser />,
           },
           {
-            path: "/user/:userId",
-            element: <UserDetails />,
-          },
-          {
-            path: "/remove/:userId",
+            path: "/user/:userId/remove",
             element: <RemoveUser />,
           }
         ],

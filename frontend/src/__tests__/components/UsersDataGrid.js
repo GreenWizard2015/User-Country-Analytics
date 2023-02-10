@@ -62,11 +62,11 @@ describe('UsersDataGrid', () => {
   it('should call viewUser with the user id when clicking on the row', () => {
     const viewUser = jest.fn();
     const user = { id: 123, first_name: 'Test', last_name: 'User', country_name: 'USA', age: 25 };
-    const props = { 
-      ...DEFAULT_PROPS, 
+    const props = {
+      ...DEFAULT_PROPS,
       viewUser,
       users: { ...DEFAULT_PROPS.users, data: [...DEFAULT_PROPS.users.data, user] },
-     };
+    };
     const { container } = render(<UsersDataGrid {...props} />);
     const row = container.querySelector('tr:nth-child(3)');
     fireEvent.click(row);
@@ -101,6 +101,23 @@ describe('UsersDataGrid', () => {
     const button = container.querySelector('tr:nth-child(3) button');
     fireEvent.click(button);
     expect(viewUser).not.toHaveBeenCalled();
+  });
+
+  it('should call only viewUser when clicking on the name', () => {
+    const removeUser = jest.fn();
+    const viewUser = jest.fn();
+    const user = { id: 123, first_name: 'Test', last_name: 'User', country_name: 'USA', age: 25 };
+    const props = {
+      ...DEFAULT_PROPS,
+      removeUser,
+      viewUser,
+      users: { ...DEFAULT_PROPS.users, data: [...DEFAULT_PROPS.users.data, user] },
+    };
+    const browser = render(<UsersDataGrid {...props} />);
+    const name = browser.getByText('Test User');
+    fireEvent.click(name);
+    expect(removeUser).not.toHaveBeenCalled();
+    expect(viewUser).toHaveBeenCalled();
   });
 
   it('should be "New user" button that calls addUser', () => {

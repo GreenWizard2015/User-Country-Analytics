@@ -12,7 +12,7 @@ export default function UsersTable({ users, viewUser, removeUser }) {
   }
   const onRowClick = React.useMemo(() => makeHandler(viewUser), [viewUser]);
   const onRemoveUser = React.useMemo(() => makeHandler(removeUser), [removeUser]);
-  
+
   // memoize the users data and columns
   const data = React.useMemo(() => users, [users]);
   const columns = React.useMemo(() => [

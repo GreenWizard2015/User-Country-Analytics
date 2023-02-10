@@ -12,12 +12,12 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
   {
     $response = $this->get('/api/users');
     $response->assertHeader('Content-Type', 'application/json');
-    $response->assertJsonFragment([
+    $response->assertJson([
       'users' => [],
       'totalPages' => 0,
     ]);
   }
-  
+
   // Route '/api/users?country=&dateFrom=&dateTo=' should return a JSON with the filtered users
   public function testFilterUsers()
   {
@@ -113,10 +113,18 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
       'page' => 1,
       'perPage' => 100000,
     ];
-    // Add the country_name to the users
-    $users->each(function ($user) use ($country) {
-      $user->country_name = $country->name;
-    });
+
+    // convert the users to array with the correct format
+    $users = $users->map(function ($user) {
+      return [
+        'id' => $user->id,
+        'first_name' => $user->first_name,
+        'last_name' => $user->last_name,
+        'country_id' => $user->country_id,
+        'country_name' => $user->country->name,
+        'date_of_birth' => $user->date_of_birth->timestamp,
+      ];
+    })->toArray();
     return [$country, $users, $query];
   }
 
@@ -126,8 +134,8 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
     list($country, $users, $query) = $this->_setupUsers();
     // Check that the response is contains the correct data for the filtered user
     $this->get('/api/users?' . http_build_query($query))
-      ->assertJsonFragment([
-        'users' => $users->toArray(),
+      ->assertJson([
+        'users' => $users,
         'totalPages' => 1,
       ]);
   }
@@ -154,16 +162,36 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
   {
     list($country, $users, $query) = $this->_setupUsers();
     $query['perPage'] = $perPage;
-    $totalPages = ceil($users->count() / $perPage);
+    $totalPages = ceil(count($users) / $perPage);
     for ($i = 1; $i <= $totalPages; $i++) {
       // Send the GET request with the current page
       $query['page'] = $i;
       $response = $this->get('/api/users?' . http_build_query($query));
-      $expectedUsers = $users->slice(($i - 1) * $perPage, $perPage)->toArray();
-      $response->assertJsonFragment([
-        'users' => array_values($expectedUsers),
-        'totalPages' => $totalPages,
+      // take the expected users for the current page
+      $expectedUsers = array_slice($users, ($i - 1) * $perPage, $perPage);
+      $response->assertJson([
+        'users' => $expectedUsers,
+        'totalPages' => (int)$totalPages,
       ]);
     }
+  }
+
+  // test that didn't hit into N+1 problem with the country relation
+  public function testGetUsersAllPagesNPlus1()
+  {
+    list($country, $users, $query) = $this->_setupUsers();
+    // Enable the query log
+    \DB::connection()->enableQueryLog();
+
+    // get all users
+    $query['perPage'] = count($users);
+    $query['page'] = 1;
+    $this->get('/api/users?' . http_build_query($query));
+
+    // Disable the query log and get the queries
+    \DB::connection()->disableQueryLog();
+    $queries = \DB::getQueryLog();
+    // Check that the number of queries is less than the number of users
+    $this->assertLessThan(count($users), count($queries));
   }
 }

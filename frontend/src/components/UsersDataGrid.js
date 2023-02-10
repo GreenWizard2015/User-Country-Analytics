@@ -102,8 +102,11 @@ export class UsersDataGrid extends Component {
 }
 
 function requiredActions() {
-  const { users: { fetchUsers }, UI: { setPage, setTotalPages, setPerPage }, actions: { AddUserDialog, RemoveUserDialog } } = storeActions;
-  return { fetchUsers, setPage, setTotalPages, setPerPage, addUser: AddUserDialog, removeUser: RemoveUserDialog };
+  const { users: { fetchUsers }, UI: { setPage, setTotalPages, setPerPage }, actions: { AddUserDialog, RemoveUserDialog, ViewUserDialog } } = storeActions;
+  return {
+    fetchUsers, setPage, setTotalPages, setPerPage,
+    addUser: AddUserDialog, removeUser: RemoveUserDialog, viewUser: ViewUserDialog,
+  };
 }
 
 export default connect(

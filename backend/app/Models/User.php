@@ -18,9 +18,15 @@ class User extends Model
         'country_id',
     ];
 
+    // cast fields
+    protected $casts = [
+        'date_of_birth' => 'datetime',
+    ];
+
     public $timestamps = false;
-    
-    public function country() {
+
+    public function country()
+    {
         return $this->belongsTo(Country::class);
     }
 
@@ -48,12 +54,5 @@ class User extends Model
         }
 
         return $query;
-    }
-
-    public function scopeWithCountryName($query)
-    {
-        $tbl = $this->getTable();
-        return $query->leftJoin('countries', 'countries.id', '=', $tbl . '.country_id')
-            ->addSelect($tbl . '.*', 'countries.name as country_name');
     }
 }

@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/react';
 import renderWithProvider from 'utils/renderWithProvider';
 import Home from 'views/Home';
 
-describe('Home', () => {
+describe('Home View', () => {
   const server = setupServer();
 
   beforeAll(() => server.listen());
@@ -28,7 +28,7 @@ describe('Home', () => {
     ];
     // Mock the API call
     server.use(
-      rest.get('/api/users', (req, res, ctx) => res(ctx.json({ users, totalPages: 1 }) ))
+      rest.get('/api/users', (req, res, ctx) => res(ctx.json({ users, totalPages: 1 })))
     );
     /////////////////////////////////////////
     const browser = renderWithProvider(<Home />);
@@ -48,7 +48,7 @@ describe('Home', () => {
     server.use(
       rest.get("/api/countries", (req, res, ctx) => {
         return res(ctx.json(
-          [ { id: 1, name: "USA", users_count: 10 }, ]
+          [{ id: 1, name: "USA", users_count: 10 },]
         ));
       })
     );
