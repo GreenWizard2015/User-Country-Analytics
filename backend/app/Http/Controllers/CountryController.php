@@ -14,7 +14,10 @@ class CountryController extends Controller
     public function all()
     {
         // calculate the number of users from each country by using the Eloquent ORM
-        $countries = Country::withCount('users')->get();
+        $countries = Country::query()
+            ->withCount('users')
+            ->whereHas('users')
+            ->get();
         // return the response as a JSON with the HTTP status code 200 and the header Content-Type: application/json
         return response()->json($countries, 200);
     }

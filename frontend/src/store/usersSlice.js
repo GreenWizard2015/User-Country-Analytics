@@ -13,8 +13,6 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAP
 // removeUser simple thunk
 export const removeUser = (id) => async (dispatch) => {
   await UsersService.removeUser(id);
-
-  // fetch users again
   await dispatch(fetchUsers());
 };
 

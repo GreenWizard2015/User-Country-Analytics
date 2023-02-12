@@ -29,10 +29,11 @@ export default function UsersTable({ users, viewUser, removeUser }) {
       accessor: 'age',
     },
     {
-      Header: 'Actions',
-      Cell: ({ row: { original: { id } } }) => <button className='btn btn-danger' onClick={onRemoveUser(id)}>Remove</button>
+      Header: () => <span className='float-end'>Actions</span>,
+      id: 'UserActions',
+      Cell: ({ row: { original: { id } } }) => <button className='btn btn-danger float-end' onClick={onRemoveUser(id)}>Remove</button>
     }
-  ], [removeUser]);
+  ], [onRemoveUser]);
 
   const {
     getTableProps,

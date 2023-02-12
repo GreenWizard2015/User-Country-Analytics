@@ -26,7 +26,6 @@ class UserController extends Controller
     // GET /users?dateFrom=&dateTo=&country=&page=&perPage= - This endpoint is used to retrieve a list of all users from the database.
     // dateFrom: nullable, unix timestamp, if provided, the users should be filtered by the date_of_birth field to only include users that were born after or on the provided date.
     // dateTo: nullable, unix timestamp, if provided, the users should be filtered by the date_of_birth field to only include users that were born before or on the provided date.
-    // Laraver can't validate the dateFrom and dateTo parameters, so we have to do it manually by regexp
     public function index(Request $request)
     {
         // Validate the request
@@ -48,7 +47,6 @@ class UserController extends Controller
 
         // Filter the users based on the provided country and date_of_birth range
         $usersQuery = \App\Models\User::query()
-            // ->with('country')
             ->dateRange($request->input('dateFrom'), $request->input('dateTo'))
             ->country($request->input('country'));
 
@@ -63,7 +61,7 @@ class UserController extends Controller
     public function show($id)
     {
         // Get the user from the database OR fail
-        return new UserResource(
+        return UserResource::make(
             \App\Models\User::findOrFail($id)
         );
     }
@@ -79,12 +77,10 @@ class UserController extends Controller
             'country_name' => 'required|string',
         ]);
         $user = \App\Models\User::findOrFail($id);
-        // Get the country from the database
-        $country = \App\Models\Country::where('name', $request->input('country_name'))->first();
         // // Get or create the country
-        // $country = \App\Models\Country::firstOrCreate([
-        //     'name' => $request->input('country_name'),
-        // ]);
+        $country = \App\Models\Country::firstOrCreate([
+            'name' => $request->input('country_name'),
+        ]);
         // Update the user
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
@@ -92,7 +88,7 @@ class UserController extends Controller
         $user->country_id = $country->id;
         $user->save();
 
-        return new UserResource($user);
+        return UserResource::make($user);
     }
 
     // DELETE /users/{id} - This endpoint is used to delete a specific user from the database. The {id} path parameter should be replaced with the id of the user you want to delete.
@@ -129,6 +125,6 @@ class UserController extends Controller
         ]);
         $user->save();
 
-        return new UserResource($user);
+        return UserResource::make($user);
     }
 }

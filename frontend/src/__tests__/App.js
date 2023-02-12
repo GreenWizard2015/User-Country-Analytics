@@ -65,25 +65,34 @@ describe('App', () => {
     expect(browser.queryByText('Create')).toBeNull();
   });
 
-  it('should create a new user', async () => {
+  it('create a new user flow', async () => {
     // mock the api
     let userCreated = false;
+    let countriesReloaded = false;
     server.use(
       rest.post('/api/users', (req, res, ctx) => {
         userCreated = true;
         return res(ctx.json({}));
       }),
       rest.get('/api/users', (req, res, ctx) => {
+        if (!userCreated) res(ctx.json({ users: [], totalPages: 1 }));
+
         return res(ctx.json({
-          users: [{ id: 1, first_name: 'John', last_name: 'Doe', date_of_birth: '2000-01-02', country_name: 'USA', country_id: 1 }],
+          users: [{ id: 1, first_name: 'John', last_name: 'Doe', date_of_birth: 0, country_name: 'USA', country_id: 1 }],
           totalPages: 1,
         }));
+      }),
+      rest.get('/api/countries', (req, res, ctx) => {
+        if (!userCreated) res(ctx.json([]));
+        countriesReloaded = true;
+        return res(ctx.json([{ id: 1, name: 'USA', users_count: 1 }]));
       })
     );
     ///////////////////////////////
     const browser = renderWithProvider(<App />);
     // wait for the / page to load and click the 'New user' button
     await browser.findByText('New user');
+    // check that no users are present
     fireEvent.click(browser.getByText('New user'));
     // wait for the /add page to load and fill in the form
     await browser.findByText('Create User');
@@ -100,11 +109,13 @@ describe('App', () => {
     await act(async () => {
       fireEvent.click(browser.getByText('Create'));
     });
-    expect(userCreated).toBe(true);
-
     // wait for the / page to load and check that the new user is present
     await browser.findByText('John Doe');
+    // we should be redirected to the / page
     expect(browser.store.getState().router.location.pathname).toBe('/');
+
+    expect(userCreated).toBe(true);
+    expect(countriesReloaded).toBe(true);
     expect(browser.getByText('John Doe')).toBeInTheDocument();
   });
 
@@ -143,6 +154,8 @@ describe('App', () => {
     // wait for the / page to load and check that the user is removed
     expect(userRemoved).toBe(true);
     await browser.findByText('No users found');
+    // and we are back on the / page
+    expect(browser.store.getState().router.location.pathname).toBe('/');
   });
 
   it('should edit a user', async () => {
@@ -187,10 +200,10 @@ describe('App', () => {
     await act(async () => {
       fireEvent.click(browser.getByText('Save'));
     });
-    expect(userEdited).toBe(true);
-
     // wait for the / page to load and check that the user is edited
     await waitFor(() => expect(browser.queryByText('Save')).toBe(null));
+
+    expect(userEdited).toBe(true);
     expect(browser.store.getState().router.location.pathname).toBe('/');
     expect(browser.getByText('Jane Doe')).toBeInTheDocument();
   });

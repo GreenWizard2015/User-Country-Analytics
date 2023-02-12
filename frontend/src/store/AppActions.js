@@ -1,6 +1,7 @@
 // Contain high level actions that can be called from components via redux
 import { push } from 'redux-first-history';
 import UsersService from 'services/UsersService';
+import { fetchUsers } from './usersSlice';
 
 export const AddUserDialog = () => (dispatch) => {
   dispatch(push('/add'));
@@ -28,6 +29,7 @@ export const createUser = (user) => async (dispatch) => {
     const { data } = await UsersService.createUser(user);
     return data;
   } finally {
+    await dispatch(fetchUsers());
     await dispatch(goHome());
   }
 };
