@@ -9,6 +9,10 @@ import { countriesSlice } from "./countriesSlice";
 import { notificationsSlice } from "./notificationsSlice";
 import { UISlice } from "./UISlice";
 import { usersSlice } from "./usersSlice";
+import { eventsSlice } from "./events";
+
+// listeners
+import { eventsListener } from "./listeners";
 
 function storeWithHistory(reducers, initialState) {
   const { routerReducer, routerMiddleware, createReduxHistory } = createReduxHistoryContext({
@@ -21,7 +25,7 @@ function storeWithHistory(reducers, initialState) {
       router: routerReducer,
     },
     preloadedState: initialState,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(routerMiddleware),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(routerMiddleware).prepend(eventsListener.middleware),
   });
   const history = createReduxHistory(store);
 
@@ -33,7 +37,8 @@ function buildAppStore(preloadedState) {
     users: usersSlice,
     countries: countriesSlice,
     notifications: notificationsSlice,
-    UI: UISlice
+    UI: UISlice,
+    events: eventsSlice,
   };
 
   const reducers = {};

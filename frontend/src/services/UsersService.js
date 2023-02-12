@@ -3,8 +3,18 @@ import axios from 'axios';
 import { API_URL } from 'config';
 
 export async function getUsers(params) {
-  const response = await axios.get(`${API_URL}/users`, { params: params });
-  return response.data;
+  const { data: { users, ...rest } } = await axios.get(`${API_URL}/users`, { params: params });
+  return {
+    // convert PHP timestamp to JS timestamp, which is in milliseconds
+    users: users.map(user => {
+      const { date_of_birth, ...rest } = user;
+      return {
+        ...rest,
+        date_of_birth: date_of_birth * 1000
+      };
+    }),
+    ...rest
+  };
 };
 
 function _prepareUser(user) {
@@ -28,7 +38,8 @@ function _prepareUser(user) {
     first_name: firstName,
     last_name: lastName,
     country_name: country,
-    date_of_birth: dateOfBirth
+    // convert date JS timestamp to PHP timestamp, which is in seconds
+    date_of_birth: Math.floor(dateOfBirth / 1000)
   };
 }
 
@@ -53,7 +64,7 @@ export async function getUser(userId) {
   const { date_of_birth, ...user } = response.data;
   return {
     ...user,
-    date_of_birth: new Date(date_of_birth)
+    date_of_birth: new Date(date_of_birth * 1000)
   };
 };
 
@@ -66,4 +77,5 @@ export async function updateUser(userId, user) {
   return response.data;
 };
 
-export default { getUsers, createUser, removeUser, getUser, updateUser };
+const UsersService = { getUsers, createUser, removeUser, getUser, updateUser };
+export default UsersService;

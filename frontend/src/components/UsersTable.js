@@ -1,6 +1,19 @@
 import React from "react";
 import { useTable } from "react-table";
 
+function calculateAge(dateOfBirth) {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  age = age ?? 0;
+  // force cast to string
+  return age + "";
+}
+
 export default function UsersTable({ users, viewUser, removeUser }) {
   function makeHandler(f) {
     return (id) => {
@@ -26,7 +39,7 @@ export default function UsersTable({ users, viewUser, removeUser }) {
     },
     {
       Header: 'Age',
-      accessor: 'age',
+      Cell: ({ row: { original: { date_of_birth } } }) => <span>{calculateAge(date_of_birth)}</span>
     },
     {
       Header: () => <span className='float-end'>Actions</span>,

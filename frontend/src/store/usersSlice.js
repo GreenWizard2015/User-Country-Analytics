@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import UsersService from 'services/UsersService';
 import { setTotalPages } from 'store/UISlice';
+import { invalidateAll } from './events';
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAPI) => {
   const { UI: { dateFrom, dateTo, country, page, perPage } } = thunkAPI.getState();
@@ -13,13 +14,13 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAP
 // removeUser simple thunk
 export const removeUser = (id) => async (dispatch) => {
   await UsersService.removeUser(id);
-  await dispatch(fetchUsers());
+  await dispatch(invalidateAll());
 };
 
 // updateUser(userId, data) simple thunk
 export const updateUser = (userId, data) => async (dispatch) => {
   await UsersService.updateUser(userId, data);
-  await dispatch(fetchUsers());
+  await dispatch(invalidateAll());
 };
 
 // fetchUser(userId) simple thunk

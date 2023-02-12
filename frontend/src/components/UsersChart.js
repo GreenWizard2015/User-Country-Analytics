@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchCountries } from 'store/countriesSlice';
+import { countriesUpdates } from 'store/events';
 import ReactEcharts from 'echarts-for-react';
 
 function getPieChartOption(countries) {
@@ -33,10 +33,14 @@ function getPieChartOption(countries) {
 }
 
 class UsersChart extends Component {
-  async componentDidMount() {
-    await this.props.fetchCountries();
+  componentDidMount() {
+    this.props.countriesUpdates(true);
   }
-  
+
+  componentWillUnmount() {
+    this.props.countriesUpdates(false);
+  }
+
   render() {
     const { countries } = this.props;
     if (!countries.loaded) {
@@ -57,7 +61,7 @@ export default connect(
   state => ({
     countries: state.countries
   }),
-  { fetchCountries }
+  { countriesUpdates }
 )(UsersChart);
 
 // for testing

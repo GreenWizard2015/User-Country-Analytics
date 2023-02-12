@@ -1,7 +1,12 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { UsersDataGrid } from 'components/UsersDataGrid';
+import moment from 'moment';
 
 describe('UsersDataGrid', () => {
+  const USERS_DATES = [
+    moment('1990-01-01', 'YYYY-MM-DD').toDate(),
+    moment('1970-11-18', 'YYYY-MM-DD').toDate(),
+  ];
   const DEFAULT_PROPS = {
     users: {
       data: [
@@ -10,14 +15,14 @@ describe('UsersDataGrid', () => {
           first_name: 'John',
           last_name: 'Doe',
           country_name: 'USA',
-          age: 25,
+          date_of_birth: USERS_DATES[0].getTime(),
         },
         {
           id: 2,
           first_name: 'Jane',
           last_name: 'Doe',
           country_name: 'Canada',
-          age: 23,
+          date_of_birth: USERS_DATES[1].getTime(),
         },
       ],
       loaded: true,
@@ -28,7 +33,7 @@ describe('UsersDataGrid', () => {
       totalPages: 1,
       perPage: 10,
     },
-    fetchUsers: async () => { },
+    usersUpdates: async () => { },
     setPage: i => { },
     setTotalPages: i => { },
     setPerPage: i => { },
@@ -175,6 +180,14 @@ describe('UsersDataGrid', () => {
       await waitFor(() => {
         expect(setPage).toHaveBeenCalledWith(30);
       });
+    });
+  });
+
+  it('should show users ages in the table', () => {
+    const { container } = render(<UsersDataGrid {...DEFAULT_PROPS} />);
+    const table = container.querySelector('table');
+    USERS_DATES.forEach(birthDate => {
+      expect(table).toHaveTextContent(moment().diff(birthDate, 'years'));
     });
   });
 });

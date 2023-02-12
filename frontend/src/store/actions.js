@@ -4,6 +4,7 @@ import { actions as countriesActions } from 'store/countriesSlice';
 import { actions as UIActions } from 'store/UISlice';
 import { actions as notificationsActions } from 'store/notificationsSlice';
 import { actions as appActions } from 'store/AppActions';
+import { actions as eventsActions } from 'store/events';
 import { push } from 'redux-first-history';
 
 const actions = {
@@ -15,5 +16,6 @@ const actions = {
     navigateTo: push
   },
   actions: appActions,
+  events: eventsActions,
 };
 export default actions;

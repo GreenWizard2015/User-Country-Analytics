@@ -5,8 +5,12 @@ import storeActions from 'store/actions';
 import UsersTable from './UsersTable';
 
 export class UsersDataGrid extends Component {
-  async componentDidMount() {
-    await this.props.fetchUsers();
+  componentDidMount() {
+    this.props.usersUpdates(true);
+  }
+
+  componentWillUnmount() {
+    this.props.usersUpdates(false);
   }
 
   paginationArea() {
@@ -102,9 +106,9 @@ export class UsersDataGrid extends Component {
 }
 
 function requiredActions() {
-  const { users: { fetchUsers }, UI: { setPage, setTotalPages, setPerPage }, actions: { AddUserDialog, RemoveUserDialog, ViewUserDialog } } = storeActions;
+  const { events: { usersUpdates }, UI: { setPage, setPerPage }, actions: { AddUserDialog, RemoveUserDialog, ViewUserDialog } } = storeActions;
   return {
-    fetchUsers, setPage, setTotalPages, setPerPage,
+    usersUpdates, setPage, setPerPage,
     addUser: AddUserDialog, removeUser: RemoveUserDialog, viewUser: ViewUserDialog,
   };
 }

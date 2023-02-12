@@ -29,3 +29,7 @@
   border: none;
   cursor: pointer;
 }
+
+.main-area {
+  max-width: 80vw;
+}

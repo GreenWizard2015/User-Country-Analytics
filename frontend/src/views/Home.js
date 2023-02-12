@@ -10,16 +10,16 @@ class Home extends Component {
   render() {
     return (
       <div className="container-fluid min-vh-100">
-        <div className="row">
-          <div className="col-12 main-area">
-            <div className="row">
-              <div className="col-6">
-                <UsersChart />
-              </div>
-              <div className="col-6">
-                <DateFilter />
-              </div>
+        <div className="col main-area mx-auto">
+          <div className="row">
+            <div className="col-6">
+              <UsersChart />
             </div>
+            <div className="col-6">
+              <DateFilter />
+            </div>
+          </div>
+          <div className="row">
             <UsersDataGrid />
           </div>
         </div>
