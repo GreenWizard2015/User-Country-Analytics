@@ -19,3 +19,5 @@ Initial project description:
 > Deploy the finished result to a publicly available repository.
 
 The project started with a minimal experience in Laravel and React/Redux, but with a general idea of the desired outcome and code quality. I added to the project's requirements the presence of tests and maximizing the use of AI in development. Despite using AI assistants like ChatGPT and Copilot, the ecosystem of Laravel and React/Redux turned out to be more challenging than expected, leading to the need to fix many things to follow best practices. The experience was valuable and it highlighted that while AI can significantly increase productivity, it cannot replace the need for expert knowledge and experience if you are pushing the limits and don't accept low-quality results. 
+
+Read also my [notes about disability & AI](disability_and_AI.md).
