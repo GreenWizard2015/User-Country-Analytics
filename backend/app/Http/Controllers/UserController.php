@@ -30,7 +30,7 @@ class UserController extends Controller
     {
         // Validate the request
         $request->validate([
-            'country' => 'exists:countries,id',
+            'country' => 'nullable|string|exists:countries,name',
             'dateFrom' => 'integer|nullable',
             'dateTo' => 'integer|nullable',
             'page' => 'integer|min:1',

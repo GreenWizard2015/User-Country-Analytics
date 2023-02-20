@@ -34,7 +34,7 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
             'date_of_birth' => '1990-01-01',
         ]);
         // Get the response from the route
-        $response = $this->get('/api/users?country=' . $countries[1]->id);
+        $response = $this->get('/api/users?country=' . $countries[1]->name);
         // Check that the response is a JSON
         $response->assertHeader('Content-Type', 'application/json');
         // Check that the response is contains the correct data for the filtered user
@@ -113,7 +113,7 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
             'date_of_birth' => '1990-01-01',
         ]);
         $query = [
-            'country' => $country->id,
+            'country' => $country->name,
             'dateFrom' => date_create_from_format('Y-m-d', '1990-01-01')->getTimestamp(),
             'dateTo' => date_create_from_format('Y-m-d', '1990-01-01')->getTimestamp(),
             'page' => 1,
@@ -192,6 +192,7 @@ class UsersFilterTest extends \Illuminate\Foundation\Testing\TestCase
         // get all users
         $query['perPage'] = count($users);
         $query['page'] = 1;
+        $query['country'] = $country->name;
         $this->get('/api/users?' . http_build_query($query));
 
         // Disable the query log and get the queries

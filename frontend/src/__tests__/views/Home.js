@@ -95,10 +95,13 @@ describe('Home View', () => {
     // Wait for the data to be fetched and displayed
     await waitFor(() => browser.findByText('John Doe'));
 
+    // dateFrom and dateTo should be converted to php timestamp format and sent as strings
+    const dateFrom = Math.floor(UIParams.dateFrom / 1000).toString();
+    const dateTo = Math.floor(UIParams.dateTo / 1000).toString();
     // Check request parameters
     expect(requestParams).toEqual({
-      dateFrom: UIParams.dateFrom.toString(),
-      dateTo: UIParams.dateTo.toString(),
+      dateFrom: dateFrom,
+      dateTo: dateTo,
       country: UIParams.country.toString(),
       page: UIParams.page.toString(),
       perPage: UIParams.perPage.toString(),

@@ -2,8 +2,20 @@
 import axios from 'axios';
 import { API_URL } from 'config';
 
+function JSTimestampToPHPTimestamp(timestamp) {
+  return Math.floor(timestamp / 1000);
+}
+
 export async function getUsers(params) {
-  const { data: { users, ...rest } } = await axios.get(`${API_URL}/users`, { params: params });
+  const { dateFrom = null, dateTo = null, ...restParams } = params || {};
+  if (dateFrom) {
+    restParams.dateFrom = JSTimestampToPHPTimestamp(dateFrom);
+  }
+  if (dateTo) {
+    restParams.dateTo = JSTimestampToPHPTimestamp(dateTo);
+  }
+
+  const { data: { users, ...rest } } = await axios.get(`${API_URL}/users`, { params: restParams, });
   return {
     // convert PHP timestamp to JS timestamp, which is in milliseconds
     users: users.map(user => {
@@ -38,8 +50,7 @@ function _prepareUser(user) {
     first_name: firstName,
     last_name: lastName,
     country_name: country,
-    // convert date JS timestamp to PHP timestamp, which is in seconds
-    date_of_birth: Math.floor(dateOfBirth / 1000)
+    date_of_birth: JSTimestampToPHPTimestamp(dateOfBirth)
   };
 }
 

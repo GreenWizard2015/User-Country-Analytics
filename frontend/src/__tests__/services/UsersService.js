@@ -38,6 +38,23 @@ describe('Users Service', () => {
     expect(response).toEqual({ users: users(dateOfBirth.JSTimestamp), totalPages });
   });
 
+  it('should send a date of birth and country filter values to the server', async () => {
+    let request;
+    server.use(
+      rest.get('/api/users', async (req, res, ctx) => {
+        request = Object.fromEntries(req.url.searchParams);
+        return res(ctx.json({ users: [], totalPages: 0 }));
+      })
+    );
+    const dateOfBirth = makeDate('01-02-2000');
+    await UsersService.getUsers({ dateFrom: dateOfBirth.JSDate, country: 'USA', dateTo: dateOfBirth.JSDate });
+    expect(request).toEqual({
+      dateFrom: dateOfBirth.PHPTimestamp.toString(),
+      dateTo: dateOfBirth.PHPTimestamp.toString(),
+      country: 'USA',
+    });
+  });
+
   it('should fetch a user data and convert to the correct format', async () => {
     const dateOfBirth = makeDate('01-02-2000');
     server.use(

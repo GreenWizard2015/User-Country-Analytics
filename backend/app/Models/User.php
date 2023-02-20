@@ -47,10 +47,11 @@ class User extends Model
         return $query;
     }
 
-    public function scopeCountry(Builder $query, $countryId = null)
+    public function scopeCountry(Builder $query, $countryName = null)
     {
-        if ($countryId) {
-            return $query->where('country_id', $countryId);
+        if ($countryName) {
+            $country = Country::where('name', $countryName)->first();
+            return $query->where('country_id', $country->id);
         }
 
         return $query;

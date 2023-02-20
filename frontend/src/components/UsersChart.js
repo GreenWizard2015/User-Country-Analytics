@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { countriesUpdates } from 'store/events';
+import { setCountry } from 'store/UISlice';
 import ReactEcharts from 'echarts-for-react';
 
-function getPieChartOption(countries) {
+function getPieChartOption(countries, activeCountry) {
+  const selectedMap = activeCountry ? { [activeCountry]: true } : {};
   return {
     title: {
       text: 'Number of Users by Country',
@@ -26,13 +28,17 @@ function getPieChartOption(countries) {
             shadowOffsetX: 0,
             shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
-        }
+        },
+        selectedMode: 'single',
+        selectedMap
       }
     ]
   };
 }
 
-class UsersChart extends Component {
+export class UsersChart extends Component {
+  _echartRef = null;
+
   componentDidMount() {
     this.props.countriesUpdates(true);
   }
@@ -41,8 +47,18 @@ class UsersChart extends Component {
     this.props.countriesUpdates(false);
   }
 
+  onEvents = {
+    'click': (e) => {
+      const chart = this._echartRef.getEchartsInstance();
+      const selectedMap = chart.getModel().getComponent('series', 0).get('selectedMap');
+      // find first key with value true or undefined
+      const selectedCountry = Object.keys(selectedMap).find(key => selectedMap[key]);
+      this.props.setCountry(selectedCountry);
+    },
+  };
+
   render() {
-    const { countries } = this.props;
+    const { countries, activeCountry } = this.props;
     if (!countries.loaded) {
       return <h1>Loading...</h1>;
     }
@@ -51,7 +67,11 @@ class UsersChart extends Component {
     }
     return (
       <div data-testid="users-chart">
-        <ReactEcharts option={getPieChartOption(countries.data)} />
+        <ReactEcharts
+          ref={(e) => { this._echartRef = e; }}
+          option={getPieChartOption(countries.data, activeCountry)}
+          onEvents={this.onEvents}
+        />
       </div>
     );
   }
@@ -59,9 +79,10 @@ class UsersChart extends Component {
 
 export default connect(
   state => ({
-    countries: state.countries
+    countries: state.countries,
+    activeCountry: state.UI.country,
   }),
-  { countriesUpdates }
+  { countriesUpdates, setCountry }
 )(UsersChart);
 
 // for testing
