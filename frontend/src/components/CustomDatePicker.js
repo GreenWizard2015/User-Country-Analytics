@@ -29,6 +29,8 @@ class CustomDatePicker extends Component {
     return (
       <DatePicker
         customInput={<CustomInput onReset={() => onChange(null)} id={id} />}
+        showMonthDropdown
+        showYearDropdown
         {...this.props}
       />
     );

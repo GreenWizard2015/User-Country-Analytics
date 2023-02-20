@@ -5,7 +5,7 @@ import { setCountry } from 'store/UISlice';
 import ReactEcharts from 'echarts-for-react';
 
 function getPieChartOption(countries, activeCountry) {
-  const selectedMap = activeCountry ? { [activeCountry]: true } : {};
+  const selectedMap = activeCountry ? { [activeCountry]: true } : null;
   return {
     title: {
       text: 'Number of Users by Country',

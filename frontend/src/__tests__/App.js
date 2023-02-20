@@ -207,4 +207,37 @@ describe('App', () => {
     expect(browser.store.getState().router.location.pathname).toBe('/');
     expect(browser.getByText('Jane Doe')).toBeInTheDocument();
   });
+
+  it('should filter users by country', async () => {
+    let countrySelected = false;
+    // mock the api
+    server.use(
+      rest.get('/api/users', (req, res, ctx) => {
+        countrySelected = req.url.searchParams.get('country');
+        if (countrySelected === 'Not USA') {
+          return res(ctx.json({ users: [], totalPages: 1 }));
+        }
+        return res(ctx.json({
+          users: [{
+            id: 1, last_name: 'Doe', date_of_birth: '2000-01-02', country_name: 'USA', country_id: 1, first_name: 'John',
+          }],
+          totalPages: 1,
+        }));
+      }),
+      rest.get('/api/countries', (req, res, ctx) => {
+        return res(ctx.json([
+          { id: 1, name: 'USA', users_count: 1 },
+          { id: 2, name: 'Not USA', users_count: 0 },
+        ]));
+      })
+    );
+    ///////////////////////////////
+    const browser = renderWithProvider(<App />);
+    // wait for the / page to load
+    await browser.findByText('John Doe');
+    // select the country
+    fireEvent.change(browser.getByTestId('country-filter-select'), { target: { value: 'Not USA' } });
+    await browser.findByText('No users found');
+    expect(countrySelected).toBe('Not USA');
+  });
 });

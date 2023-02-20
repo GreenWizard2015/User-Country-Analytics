@@ -13,7 +13,7 @@ class DateFilter extends Component {
 
     return (
       <div className="row date-filter">
-        <div className="col-md-5 col-12">
+        <div className="col-md-6 col-12 px-0">
           <CustomDatePicker
             dateFormat="dd-MM-yyyy"
             selected={dateFrom}
@@ -26,7 +26,7 @@ class DateFilter extends Component {
           />
         </div>
 
-        <div className="col-md-5 col-12">
+        <div className="col-md-6 col-12 px-0">
           <CustomDatePicker
             dateFormat="dd-MM-yyyy"
             selected={dateTo}

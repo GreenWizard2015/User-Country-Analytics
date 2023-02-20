@@ -42,6 +42,15 @@ describe('getPieChartOption', () => {
     expect(selectedMap).toEqual({ Canada: true });
   });
 
+  it('should return the correct option for no selected country', () => {
+    const countries = [
+      { id: 1, name: 'United States', users_count: 10 },
+    ];
+    const { series: [{ selectedMap, selectedMode }] } = getPieChartOption(countries);
+    expect(selectedMode).toEqual('single');
+    expect(selectedMap).toEqual(null);
+  });
+
   // disabled because it's not working at all, due to the way echarts-for-react is implemented
   false && it('should call setCountry when a country is clicked', async () => {
     const setCountry = jest.fn();
