@@ -1,5 +1,17 @@
 # User Country Analytics
 
+![Screenshot of the application](user-country-analytics.png)
+
+## Very brief project overview
+
+During this project, I had learn the basics of Laravel and Redux (in ReactJS) while simultaneously exploring the capabilities of AI and its potential to help people with disabilities. The focus was on using AI assistants (ChatGPT and Copilot) to aid in the development process. In contrast to other similar projects, special attention was paid to code maintainability and testability. The final version of the project included over 30 tests for the backend and over 50 tests for the frontend. The goal was not only to create an application but also to ensure that the code could be easily maintained and extended in the future.
+
+Effective collaboration between humans and AI was also a key consideration in the project. While AI can augment our abilities and help us overcome limitations, it cannot replace the need for expert knowledge and experience. The project highlighted the importance of balancing AI's potential with human expertise to achieve the best outcomes.
+
+Overall, the project demonstrated the potential for AI to revolutionize the way people with disabilities work and interact with the world around them. While there are still challenges to overcome, the benefits of using AI to augment our abilities are significant and undeniable. With continued exploration and development, AI has the potential to transform the lives of people with disabilities and improve accessibility for all.
+
+---
+
 Initial project description:
 
 > Create a simple php application using the laravel framework, a mysql database and the React JS framework on the frontend. If you are familiar with that, create it as a Single Page Applications. So the backend will be pure REST API and frontend will be compiled static javascript, which communicates with backend API only via ajax requsts. 
