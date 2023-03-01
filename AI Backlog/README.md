@@ -16,7 +16,7 @@ ChatGPT demonstrated good knowledge of Linux/Ubuntu and Laravel. There were some
 
 ## 02 - Create the database and tables
 
-Conversation: [02 - Create the database and tables.md]
+Conversation: [02 - Create the database and tables.md](https://github.com/GreenWizard2015/User-Country-Analytics/blob/main/AI%20Backlog/02%20-%20Create%20the%20database%20and%20tables.md)
 
 ChatGPT analysis of conversation:
 
