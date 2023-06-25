@@ -1,5 +1,7 @@
 [The ReadME Project](https://github.com/readme) wrote an [article](https://github.com/readme/featured/open-source-accessibility) about my experience working with AI and accessibility.
 
+In the article ["Harness the power of generative AI for software development"](https://github.com/readme/guides/coding-generative-ai)  I discussed various aspects of utilizing AI in software development and other domains.
+
 # User Country Analytics
 
 ![Screenshot of the application](user-country-analytics.png)
